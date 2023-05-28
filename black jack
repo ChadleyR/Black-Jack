@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blackjack</title>
+  <style>
+    /* Add your CSS styles here */
+  </style>
+</head>
+<body>
+  <h1>Blackjack</h1>
+  <div id="game">
+    <button onclick="startGame()">Start Game</button>
+    <button onclick="hit()">Hit</button>
+    <button onclick="stand()">Stand</button>
+  </div>
+  <script>
+    // JavaScript code for the game logic
+
+    // Card suits and ranks
+    var suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
+    var ranks = ["Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"];
+
+    // Initialize game variables
+    var deck = [];
+    var playerHand = [];
+    var dealerHand = [];
+
+    function startGame() {
+      deck = createDeck();
+      playerHand = [getNextCard(), getNextCard()];
+      dealerHand = [getNextCard(), getNextCard()];
+      // Display the game state and continue the game logic
+      displayGameState();
+    }
+
+    function createDeck() {
+      var deck = [];
+      for (var suitIndex = 0; suitIndex < suits.length; suitIndex++) {
+        for (var rankIndex = 0; rankIndex < ranks.length; rankIndex++) {
+          var card = {
+            suit: suits[suitIndex],
+            rank: ranks[rankIndex]
+          };
+          deck.push(card);
+        }
+      }
+      return deck;
+    }
+
+    function getNextCard() {
+      return deck.pop();
+    }
+
+    function calculateHandValue(hand) {
+      var total = 0;
+      var hasAce = false;
+      for (var i = 0; i < hand.length; i++) {
+        var card = hand[i];
+        total += getCardValue(card);
+        if (card.rank === "Ace") {
+          hasAce = true;
+        }
+      }
+      if (hasAce && total + 10 <= 21) {
+        total += 10;
+      }
+      return total;
+    }
+
+    function getCardValue(card) {
+      switch (card.rank) {
+        case "Ace":
+          return 1;
+        case "2":
+          return 2;
+        case "3":
+          return 3;
+        case "4":
+          return 4;
+        case "5":
+          return 5;
+        case "6":
+          return 6;
+        case "7":
+          return 7;
+        case "8":
+          return 8;
+        case "9":
+          return 9;
+        default:
+          return 10;
+      }
+    }
+
+    function displayGameState() {
+      var gameDiv = document.getElementById("game");
+      gameDiv.innerHTML = "";
+
+      var playerScore = calculateHandValue(playerHand);
+      var dealerScore = calculateHandValue(dealerHand);
+
+      gameDiv.innerHTML += "<h2>Player Hand:</h2>";
+      for (var i = 0; i < playerHand.length; i++) {
+        gameDiv.innerHTML += "<p>" + playerHand[i].rank + " of " + playerHand[i].suit + "</p>";
+      }
+      gameDiv.innerHTML += "<p>Score: " + playerScore + "</p>";
+
+      gameDiv.innerHTML += "<h2>Dealer Hand:</h2>";
+      for (var i = 0; i < dealerHand.length; i++) {
+        gameDiv.innerHTML += "<p>" + dealerHand[i].rank + " of " + dealerHand[i].suit + "</p>";
+      }
+      gameDiv.innerHTML += "<p>Score: " + dealerScore + "</p>";
+    }
+
+    function hit() {
+      playerHand.push(getNextCard());
+      var playerScore = calculateHandValue(playerHand);
+      if (playerScore > 21) {
+        endGame("Player Busts!");
+      }
+      else {
+        displayGameState();
+      }
+    }
+
+    function stand() {
+      while (calculateHandValue(dealerHand) < 17) {
+        dealerHand.push(getNextCard());
+      }
+      var dealerScore = calculateHandValue(dealerHand);
+      if (dealerScore > 21 || dealerScore < calculateHandValue(playerHand)) {
+        endGame("Player Wins!");
+      }
+      else if (dealerScore > calculateHandValue(playerHand)) {
+        endGame("Dealer Wins!");
+      }
+      else {
+        endGame("Push!");
+      }
+    }
+
+    function endGame(message) {
+      displayGameState();
+      var gameDiv = document.getElementById("game");
+      gameDiv.innerHTML += "<h2>" + message + "</h2>";
+      gameDiv.innerHTML += "<button onclick=\"startGame()\">New Game</button>";
+    }
+  </script>
+</body>
+</html>
